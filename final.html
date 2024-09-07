@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js Parallelepipeds with Mouse Control</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script type="module">
+        // Import Three.js and OrbitControls as modules
+        import * as THREE from 'https://unpkg.com/three@0.150.1/build/three.module.js';
+        import { OrbitControls } from 'https://unpkg.com/three@0.150.1/examples/jsm/controls/OrbitControls.js';
+
+        // Step 1: Initialize Three.js Scene, Camera, and Renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Step 2: Add OrbitControls for mouse control
+        const controls = new OrbitControls(camera, renderer.domElement);
+
+        // Step 3: Fetch JSON data and process
+        fetch('public/data.json')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Data loaded from json:', data);
+
+                const centers = data.trans[0];
+                const offsets = data.offset[0];
+                const normals = data.norm[0];
+
+                // Step 4: Create Parallelepiped Geometry and Material
+                const geometry = new THREE.BoxGeometry(1, 1, 1);  // Default box geometry
+                const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+
+                // Step 5: Loop through each center, offset, and normal
+                for (let i = 0; i < centers.length; i++) {
+                    const parallelepiped = new THREE.Mesh(geometry, material);
+
+                    // Apply position from trans (centers)
+                    parallelepiped.position.set(centers[i][0], centers[i][1], centers[i][2]);
+
+                    // Optional: Apply offset if you want to change the position
+                    parallelepiped.position.add(new THREE.Vector3(
+                        offsets[i][0][0], 
+                        offsets[i][1][0], 
+                        offsets[i][2][0]
+                    ));
+
+                    // Apply rotation based on normals
+                    const normal = new THREE.Vector3(
+                        normals[i][0][0], 
+                        normals[i][0][1], 
+                        normals[i][0][2]
+                    );
+                    parallelepiped.lookAt(normal);
+
+                    // Add each parallelepiped to the scene
+                    scene.add(parallelepiped);
+                }
+
+                // Step 6: Set camera position
+                camera.position.z = 5;
+
+                // Step 7: Render the scene
+                function animate() {
+                    requestAnimationFrame(animate);
+                    controls.update();  // Required to keep OrbitControls working
+                    renderer.render(scene, camera);
+                }
+                animate();
+            })
+            .catch(error => {
+                console.error('Error loading JSON data:', error);
+            });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
