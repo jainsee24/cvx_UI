@@ -52,6 +52,7 @@ Ensure that you have the following installed on your system:
 
    ```bash
    npm install
+   npm install three
    ```
 
 ## Running the Project
@@ -63,7 +64,7 @@ To run the project locally, you can use Vite's development server:
    Run the following command:
 
    ```bash
-   npm run dev
+   npx vite
    ```
 
    This will start a local development server, and you should see output similar to:
