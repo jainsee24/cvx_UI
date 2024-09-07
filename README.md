@@ -37,13 +37,13 @@ Ensure that you have the following installed on your system:
    Clone this repository to your local machine:
 
    ```bash
-   git clone https://github.com/yourusername/threejs-parallelepiped-transform.git
+   git clone https://github.com/jainsee24/cvx_UI.git
    ```
 
 2. **Navigate to the Project Directory**
 
    ```bash
-   cd threejs-parallelepiped-transform
+   cd cvx_UI
    ```
 
 3. **Install Dependencies**
