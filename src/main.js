@@ -54,7 +54,7 @@ class ParallelepipedTransformer {
     const centerZ = (zm + zM) / 2;
 
     // Apply the transformation to find ox, oy, oz
-    const { u: ox, v: oy, w: oz } = this.transform(centerX, centerY, centerZ, xm, xM, ym, yM, zm, zM);
+    const { u: ox, v: oy, w: oz } = this.transform(0, 0, 0, xm, xM, ym, yM, zm, zM);
 
     return { ox, oy, oz };
   }
@@ -123,7 +123,7 @@ function createParallelepiped(center, distances, normals, color) {
   document.body.appendChild(renderer.domElement);
   
   // Set the camera's up direction to prevent upside down view
-  camera.up.set(-0.1, -1, 0);
+  // camera.up.set(0, -1, 0);
   
   // Controls for orbiting the camera
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -234,6 +234,10 @@ function createParallelepiped(center, distances, normals, color) {
       const normals = data.norm;
   
       const transformer = new ParallelepipedTransformer();
+      const allX = [];
+      const allY = [];
+      const allZ = [];
+  
   
       centers[0].forEach((center, index) => {
         const offset = [
@@ -253,6 +257,17 @@ function createParallelepiped(center, distances, normals, color) {
         const geometry = createParallelepiped(new THREE.Vector3(...center), offset, normal, color);
         const material = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide });
         const parallelepiped = new THREE.Mesh(geometry, material);
+
+        geometry.attributes.position.array.forEach((vertex, i) => {
+          if (i % 3 === 0) {
+            allX.push(vertex); // x-coordinate
+          } else if (i % 3 === 1) {
+            allY.push(vertex); // y-coordinate
+          } else {
+            allZ.push(vertex); // z-coordinate
+          }
+        });
+  
   
         // Add initial transformation data
         parallelepipedData.push({
@@ -263,8 +278,11 @@ function createParallelepiped(center, distances, normals, color) {
   
         scene.add(parallelepiped);
       });
+      const { ox, oy, oz } = transformer.findCenter(allX, allY, allZ);
+      camera.position.set(ox, oy, oz);
   
-      camera.position.set(0.1348, -3.978e-17, -0.6356);
+  
+      // camera.position.set(0.1348, -3.978e-17, -0.6356);
     });
   
   // Lighting
